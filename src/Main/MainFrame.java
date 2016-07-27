@@ -26,24 +26,23 @@ public class MainFrame extends JFrame {
 
     private void setupJframe() {
 //        setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(),(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight());
-        setSize(1920,1080);
+        setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBackground(Color.WHITE);
-        setUndecorated(true);
+//        setUndecorated(true);
         setLayout(null);
-
 
 
         mainPanel = new JPanel();
         mainPanel.setLayout(null);
         mainPanel.setSize(getWidth(), getHeight());
-        mainPanel.setLocation(0,0);
+        mainPanel.setLocation(0, 0);
 
         for (int i = 0; i < imagePanels.length; i++) {
 
             imagePanels[i] = new ImagePanel(this, mainPaths[i], detailPaths[i]);
-            imagePanels[i].setLocation(i*600, 0);
-             mainPanel.add(imagePanels[i]);
+            imagePanels[i].setLocation(i * 600, 0);
+            mainPanel.add(imagePanels[i]);
         }
 
         getContentPane().add(mainPanel);
@@ -51,32 +50,31 @@ public class MainFrame extends JFrame {
     }
 
     public void gotoNextImage() {
-        if(currentImgIndex == imagePanels.length) {
+        if (currentImgIndex == imagePanels.length) {
             currentImgIndex++;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     int width = getWidth();
-                    while(width > 0)
-                    {
+                    while (width > 0) {
                         try {
                             mainPanel.setLocation(offset, 100);
                             repaint();
-                            offset-=10;
-                            width-=10;
+                            offset -= 10;
+                            width -= 10;
                             Thread.sleep(10);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                    mainPanel.setLocation(currentImgIndex*getWidth(), 100);
+                    mainPanel.setLocation(currentImgIndex * getWidth(), 100);
                 }
             }).start();
         }
     }
 
     public void gotoPrevImage() {
-        if(currentImgIndex == imagePanels.length) {
+        if (currentImgIndex == imagePanels.length) {
             currentImgIndex--;
         }
     }
@@ -86,8 +84,7 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
-    public void displacePanel(int distance)
-    {
+    public void displacePanel(int distance) {
         imagePanels[currentImgIndex].setLocation(distance, 100);
         repaint();
     }
