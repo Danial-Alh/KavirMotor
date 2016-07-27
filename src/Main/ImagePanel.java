@@ -24,12 +24,14 @@ int dis;
         public String mainPath;
         public String detailPath;
 
-        public ImageDetail(String mianPath, String detailPath) {
-            this.mainPath = mianPath;
+        public ImageDetail(String mainPath, String detailPath) {
+            this.mainPath = mainPath;
             this.detailPath = detailPath;
             try {
-                img = ImageIO.read(new File(mainPath));
-                detailImg = ImageIO.read(new File(detailPath));
+                File mainImgFile = new File(mainPath);
+                File detailImgFile = new File(detailPath);
+                img = ImageIO.read(mainImgFile);
+                detailImg = ImageIO.read(detailImgFile);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -55,7 +57,7 @@ int dis;
     public void paintComponent(Graphics g) {
         g.fillRect(0,0, getWidth(), getHeight());
         g.drawImage(imageDetail.img,0, dis, null);
-        g.drawImage(imageDetail.detailImg,0, dis+600, null);       
+        g.drawImage(imageDetail.detailImg,0, dis+600, null);
     }
 
     class Listener implements MouseListener, MouseMotionListener {
@@ -65,9 +67,16 @@ int dis;
         ImagePanel i=(ImagePanel)e.getSource();
         i.y=e.getY();
         }
-        
+
 
         public void mouseReleased(MouseEvent e) {
+            boolean isLeftRightSwipe = true;
+            if(isLeftRightSwipe)
+            {
+                if(dis > 0)
+                    parent.gotoNextImage();
+            }
+
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -83,16 +92,16 @@ int dis;
                 ImagePanel i=(ImagePanel)e.getSource();
                 i.setimage(-i.y+e.getY());
 //                i.y=e.getY();
-                
-                
-            
-           
+
+
+
+
         }
 
 
         public void mouseMoved(MouseEvent e) {
 
-           
+
             }
         }
     }
