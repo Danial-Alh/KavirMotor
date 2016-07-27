@@ -1,5 +1,5 @@
 
-package javaapplication3;
+package JavaApplication3;
 
 import java.awt.Color;
 import java.awt.Dimension;
