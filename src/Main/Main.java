@@ -9,18 +9,16 @@ import javax.swing.JFrame;
 public class Main {
     
     private static JFrame frm;
-    public ImagePanel[] imagePanels;
-    public static int x, y;
-
 
     public static void main(String[] args) {
 
 
         //specifypaths
-
+        String[] main = new String[]{"kavir/4507.JPG"};
+        String[] details = new String[]{"kavir/4507.JPG"};
         ///
 
-        frm = new MainFrame(null);
+        frm = new MainFrame(main, details);
     }
 
 
