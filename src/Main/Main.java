@@ -20,8 +20,7 @@ public class Main {
 
         ///
 
-        lsdkfj
-        frm = new JFrame();
+        frm = new MainFrame(null);
     }
 
 

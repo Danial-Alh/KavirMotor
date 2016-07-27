@@ -11,9 +11,7 @@ import java.io.IOException;
 
 class ImagePanel extends JPanel {
 
-    private Image img;
-    class ImageDetail
-    {
+    class ImageDetail {
         public Image img;
         public Image detailImg;
         public String mainPath;
@@ -30,11 +28,14 @@ class ImagePanel extends JPanel {
             }
         }
     }
-    ImageDetail imageDetail;
 
-    public ImagePanel(String mainImgSrc, String detailImgSource) {
+    ImageDetail imageDetail;
+    MainFrame parent;
+
+    public ImagePanel(MainFrame parent, String mainImgSrc, String detailImgSource) {
+        this.parent = parent;
         imageDetail = new ImageDetail(mainImgSrc, detailImgSource);
-        Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
+        Dimension size = new Dimension(imageDetail.img.getWidth(null), imageDetail.img.getHeight(null));
         setPreferredSize(size);
         setMinimumSize(size);
         setMaximumSize(size);
@@ -45,23 +46,23 @@ class ImagePanel extends JPanel {
     }
 
     public void paintComponent(Graphics g) {
-        g.drawImage(img, 0, 0, null);
+        g.drawImage(imageDetail.img, 0, 0, null);
 
     }
 
-    static class Listener implements MouseListener, MouseMotionListener {
+    class Listener implements MouseListener, MouseMotionListener {
 
 
         public void mousePressed(MouseEvent e) {
-            Main.Main.pressed = true;
-            Main.Main.x = e.getX();
-            Main.Main.y = e.getY();
+            parent.pressed = true;
+            parent.x = e.getX();
+            parent.y = e.getY();
 
         }
 
 
         public void mouseReleased(MouseEvent e) {
-            Main.Main.pressed = false;
+            parent.pressed = false;
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -79,12 +80,12 @@ class ImagePanel extends JPanel {
 
         public void mouseMoved(MouseEvent e) {
 
-            if (Main.Main.pressed == true) {
+            if (parent.pressed == true) {
                 //set panels location
 
                 ///
-                Main.Main.x = e.getX();
-                Main.Main.y = e.getY();
+                parent.x = e.getX();
+                parent.y = e.getY();
             }
         }
     }
