@@ -15,12 +15,12 @@ public class Main {
 
         //specifypaths
         String[] main = new String[]{
-                "kavir/4507.Jpg",
-                "kavir/8959.Jpg"
+                "kavir/4507.Jpg"
+//                "kavir/8959.Jpg"
         };
         String[] details = new String[]{
-                "kavir/Capture.JPG",
-                "kavir/Capture.JPG"
+                "kavir/Capture(1).JPG"
+//                "kavir/Capture.JPG"
         };
         ///
 

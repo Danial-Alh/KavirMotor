@@ -25,11 +25,11 @@ public class MainFrame extends JFrame {
     }
 
     private void setupJframe() {
-//        setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(),(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight());
-        setSize(1920, 1080);
+        setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(),(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight());
+//        setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBackground(Color.WHITE);
-//        setUndecorated(true);
+        setUndecorated(true);
         setLayout(null);
 
 
@@ -41,7 +41,7 @@ public class MainFrame extends JFrame {
         for (int i = 0; i < imagePanels.length; i++) {
 
             imagePanels[i] = new ImagePanel(this, mainPaths[i], detailPaths[i]);
-            imagePanels[i].setLocation(i * 600, 0);
+            imagePanels[i].setLocation(i * getWidth(), 0);
             mainPanel.add(imagePanels[i]);
         }
 
@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
     }
 
     public void gotoNextImage() {
-        if (currentImgIndex == imagePanels.length) {
+        if (currentImgIndex < imagePanels.length-1) {
             currentImgIndex++;
             new Thread(new Runnable() {
                 @Override
@@ -58,7 +58,7 @@ public class MainFrame extends JFrame {
                     int width = getWidth();
                     while (width > 0) {
                         try {
-                            mainPanel.setLocation(offset, 100);
+                            mainPanel.setLocation(offset, 0);
                             repaint();
                             offset -= 10;
                             width -= 10;
@@ -67,7 +67,7 @@ public class MainFrame extends JFrame {
                             e.printStackTrace();
                         }
                     }
-                    mainPanel.setLocation(currentImgIndex * getWidth(), 100);
+                    mainPanel.setLocation(currentImgIndex * getWidth(), 0);
                 }
             }).start();
         }
@@ -80,12 +80,12 @@ public class MainFrame extends JFrame {
     }
 
     public void stayOnThisImage() {
-        imagePanels[currentImgIndex].setLocation(0, 100);
+        imagePanels[currentImgIndex].setLocation(0, 0);
         repaint();
     }
 
     public void displacePanel(int distance) {
-        imagePanels[currentImgIndex].setLocation(distance, 100);
+        imagePanels[currentImgIndex].setLocation(distance, 0);
         repaint();
     }
 }
