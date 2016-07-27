@@ -11,9 +11,10 @@ import java.io.IOException;
 
 class ImagePanel extends JPanel {
 int y;
+int dis;
 
     void setimage(int distance) {
-        this.y=distance;
+        this.dis=distance;
         this.repaint();
     }
 
@@ -45,15 +46,16 @@ int y;
 //        setPreferredSize(size);
 //        setMinimumSize(size);
 //        setMaximumSize(size);
-        setSize(this.getParent().getSize());
+        setSize(this.parent.getSize());
         setLayout(null);
         addMouseListener(new Listener());
         addMouseMotionListener(new Listener());
     }
 
     public void paintComponent(Graphics g) {
-        g.drawImage(imageDetail.img,0, y, null);
-        g.drawImage(imageDetail.img,0, y+600, null);       
+        g.fillRect(0,0, getWidth(), getHeight());
+        g.drawImage(imageDetail.img,0, dis, null);
+        g.drawImage(imageDetail.detailImg,0, dis+600, null);       
     }
 
     class Listener implements MouseListener, MouseMotionListener {
@@ -79,8 +81,8 @@ int y;
 
         public void mouseDragged(MouseEvent e) {
                 ImagePanel i=(ImagePanel)e.getSource();
-                i.setimage(i.y-e.getY());
-                i.y=e.getY();
+                i.setimage(-i.y+e.getY());
+//                i.y=e.getY();
                 
                 
             

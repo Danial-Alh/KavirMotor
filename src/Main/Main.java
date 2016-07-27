@@ -15,7 +15,7 @@ public class Main {
 
         //specifypaths
         String[] main = new String[]{"kavir/4507.JPG"};
-        String[] details = new String[]{"kavir/4507.JPG"};
+        String[] details = new String[]{"kavir/Capture.JPG"};
         ///
 
         frm = new MainFrame(main, details);

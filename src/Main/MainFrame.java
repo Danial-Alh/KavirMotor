@@ -10,13 +10,14 @@ public class MainFrame extends JFrame {
     public ImagePanel[] imagePanels;
     public static boolean pressed;
     public static int x, y;
+    private int currentImgIndex;
+    private JPanel mainPanel;
 
     public MainFrame(String[] mainPaths, String[] detailPaths) throws HeadlessException {
         this.mainPaths = mainPaths;
         this.detailPaths = detailPaths;
         this.currentImgIndex = 0;
         imagePanels = new ImagePanel[mainPaths.length];
-
 
         setupJframe();
     }
