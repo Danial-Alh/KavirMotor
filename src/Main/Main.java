@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 
 
 public class Main {
-
+    
     private static JFrame frm;
     public ImagePanel[] imagePanels;
     public static int x, y;

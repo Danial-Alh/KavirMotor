@@ -11,8 +11,8 @@ public class MainFrame extends JFrame {
     public ImagePanel[] imagePanels;
     public static boolean pressed;
     public static int x, y;
-
-
+    
+    
     public MainFrame(String[] paths) throws HeadlessException {
         this.paths = paths;
         setupJframe();

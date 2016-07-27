@@ -10,6 +10,12 @@ import java.io.File;
 import java.io.IOException;
 
 class ImagePanel extends JPanel {
+int y;
+
+    void setimage(int distance) {
+        this.y=distance;
+        this.repaint();
+    }
 
     class ImageDetail {
         public Image img;
@@ -36,33 +42,30 @@ class ImagePanel extends JPanel {
         this.parent = parent;
         imageDetail = new ImageDetail(mainImgSrc, detailImgSource);
         Dimension size = new Dimension(imageDetail.img.getWidth(null), imageDetail.img.getHeight(null));
-        setPreferredSize(size);
-        setMinimumSize(size);
-        setMaximumSize(size);
-        setSize(size);
+//        setPreferredSize(size);
+//        setMinimumSize(size);
+//        setMaximumSize(size);
+        setSize(this.getParent().getSize());
         setLayout(null);
         addMouseListener(new Listener());
         addMouseMotionListener(new Listener());
     }
 
     public void paintComponent(Graphics g) {
-        g.drawImage(imageDetail.img, 0, 0, null);
-
+        g.drawImage(imageDetail.img,0, y, null);
+        g.drawImage(imageDetail.img,0, y+600, null);       
     }
 
     class Listener implements MouseListener, MouseMotionListener {
 
 
         public void mousePressed(MouseEvent e) {
-            parent.pressed = true;
-            parent.x = e.getX();
-            parent.y = e.getY();
-
+        ImagePanel i=(ImagePanel)e.getSource();
+        i.y=e.getY();
         }
-
+        
 
         public void mouseReleased(MouseEvent e) {
-            parent.pressed = false;
         }
 
         public void mouseClicked(MouseEvent e) {
@@ -75,18 +78,20 @@ class ImagePanel extends JPanel {
         }
 
         public void mouseDragged(MouseEvent e) {
+                ImagePanel i=(ImagePanel)e.getSource();
+                i.setimage(i.y-e.getY());
+                i.y=e.getY();
+                
+                
+            
+           
         }
 
 
         public void mouseMoved(MouseEvent e) {
 
-            if (parent.pressed == true) {
-                //set panels location
-
-                ///
-                parent.x = e.getX();
-                parent.y = e.getY();
+           
             }
         }
     }
-}
+
