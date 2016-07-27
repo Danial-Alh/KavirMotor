@@ -8,12 +8,22 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class ImagePanel extends JPanel {
+
     int y;
     int dis;
     int lastY = 0;
 
+    public void reset(){
+        int lastY = 0;
+        
+    }
+    
+    
+    
     void setimage(int distance) {
         this.dis = distance + lastY;
 
@@ -21,6 +31,7 @@ class ImagePanel extends JPanel {
     }
 
     class ImageDetail {
+
         public Image img;
         public Image detailImg;
         public String mainPath;
@@ -59,20 +70,18 @@ class ImagePanel extends JPanel {
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
 //        g.drawImage(imageDetail.img, 0, dis, null);
-        g.drawImage(imageDetail.img, (getWidth() - imageDetail.img.getWidth(null)) / 2, dis, null);
+        g.drawImage(imageDetail.img, (getWidth() - imageDetail.img.getWidth(null)) / 2, dis + (getHeight() - imageDetail.img.getHeight(null)) / 2, null);
 //        g.drawImage(imageDetail.detailImg, 0, dis + this.getParent().getHeight(), null);
         g.drawImage(imageDetail.detailImg, (getWidth() - imageDetail.detailImg.getWidth(null)) / 2, dis + this.getParent().getHeight(), null);
     }
 
     class Listener implements MouseListener, MouseMotionListener {
 
-
         public void mousePressed(MouseEvent e) {
             ImagePanel i = (ImagePanel) e.getSource();
             i.y = e.getY();
 
         }
-
 
         public void mouseReleased(MouseEvent e) {
             lastY = dis;
@@ -82,31 +91,36 @@ class ImagePanel extends JPanel {
 //                if(dis > 0)
 //                    parent.gotoNextImage();
 //            }
-
-        }
-
-        public void mouseClicked(MouseEvent e) {
-        }
-
-        public void mouseEntered(MouseEvent e) {
-        }
-
-        public void mouseExited(MouseEvent e) {
-        }
-
-        public void mouseDragged(MouseEvent e) {
             ImagePanel i = (ImagePanel) e.getSource();
-            i.setimage(-i.y + e.getY());
+            int last = i.lastY;
+            if (last > 0 && last < i.getHeight()/2) {
+                setimage(0);
+            }
+            if (last < 0) {
+                setimage(0);
+            }
+        }
+
+    
+
+    public void mouseClicked(MouseEvent e) {
+    }
+
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    public void mouseExited(MouseEvent e) {
+    }
+
+    public void mouseDragged(MouseEvent e) {
+        ImagePanel i = (ImagePanel) e.getSource();
+        i.setimage(-i.y + e.getY());
 //                i.y=e.getY();
 
+    }
 
-        }
+    public void mouseMoved(MouseEvent e) {
 
-
-        public void mouseMoved(MouseEvent e) {
-
-
-        }
     }
 }
-
+}
