@@ -12,9 +12,11 @@ import java.io.IOException;
 class ImagePanel extends JPanel {
 int y;
 int dis;
+int lastY=0;
 
     void setimage(int distance) {
-        this.dis=distance;
+        this.dis=distance+lastY;
+        
         this.repaint();
     }
 
@@ -53,9 +55,10 @@ int dis;
     }
 
     public void paintComponent(Graphics g) {
+        g.setColor(Color.white);
         g.fillRect(0,0, getWidth(), getHeight());
-        g.drawImage(imageDetail.img,0, dis, null);
-        g.drawImage(imageDetail.detailImg,0, dis+600, null);       
+        g.drawImage(imageDetail.img,(this.getParent().getWidth()-imageDetail.img.getWidth(null))/2, dis, null);
+        g.drawImage(imageDetail.detailImg,(this.getParent().getWidth()-imageDetail.detailImg.getWidth(null))/2, dis+this.getParent().getHeight(), null);       
     }
 
     class Listener implements MouseListener, MouseMotionListener {
@@ -68,6 +71,7 @@ int dis;
         
 
         public void mouseReleased(MouseEvent e) {
+            lastY=dis;
         }
 
         public void mouseClicked(MouseEvent e) {
