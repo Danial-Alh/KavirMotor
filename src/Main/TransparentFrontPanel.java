@@ -26,6 +26,7 @@ public class TransparentFrontPanel extends JPanel implements MouseMotionListener
     @Override
     public void mouseDragged(MouseEvent e) {
 
+
     }
 
     @Override
