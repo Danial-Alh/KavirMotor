@@ -81,21 +81,33 @@ public class TransparentFrontPanel extends JPanel implements MouseMotionListener
     }
 
     @Override
-    public void mouseReleased(MouseEvent e)
+    public synchronized void mouseReleased(MouseEvent e)
     {
         endPoint = new Point(e.getX(), e.getY());
         double hortizalD = endPoint.getX() - startPoint.getX();
         double verticalD = endPoint.getY() - startPoint.getY();
-        if (currentMovingAxis == Boolean.TRUE)
+        Boolean tempBool = currentMovingAxis;
+        if(tempBool != null)
         {
-            if (verticalD > 0) parent.gotoUpperRow();
-            if (verticalD < 0) parent.gotoLowerRow();
-        } else
-        {
-            if (hortizalD > 0) parent.gotoPrevColumn();
-            if (hortizalD < 0) parent.gotoNextColumn();
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (tempBool == Boolean.TRUE)
+                    {
+                        if (verticalD > 0) parent.gotoUpperRow();
+                        if (verticalD < 0) parent.gotoLowerRow();
+                    }
+                    else
+                    {
+                        if (hortizalD > 0) parent.gotoPrevColumn();
+                        if (hortizalD < 0) parent.gotoNextColumn();
+                    }
+                }
+            }).start();
+            currentMovingAxis = null;
         }
-        currentMovingAxis = null;
     }
 
     @Override

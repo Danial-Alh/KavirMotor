@@ -22,9 +22,8 @@ public class MainFrame extends JFrame
     private Image kavirImg;
 
     private Point offset;
-    private Object condition;
-    private Object semaphore, semaphore2;
-    private boolean busy, isSemaphoreLocked, isSemaphoreLocked2;
+    private final Object condition;
+    private boolean busy, isConditionLocked;
 
     public MainFrame(String[] mainPaths, String[] detailPaths) throws HeadlessException
     {
@@ -32,9 +31,7 @@ public class MainFrame extends JFrame
         this.detailPaths = detailPaths;
         this.offset = new Point(0, 0);
         condition = new Object();
-        semaphore = new Object();
-        semaphore2 = new Object();
-        isSemaphoreLocked = isSemaphoreLocked2 = busy = false;
+        isConditionLocked = busy = false;
 
         this.currentRow = 0;
         this.xOffsets = new int[numberOfRows];
@@ -98,158 +95,58 @@ public class MainFrame extends JFrame
 
     public void gotoNextColumn()
     {
-        System.out.println("get in next, sem2: " + isSemaphoreLocked2);
-        lockSemaphore2();
-        if(busy)
+        if (lockOnCondition())
         {
-            System.out.println("returned");
-            freeSemaphore2();
-            return;
-        }
-        System.out.println("passed");
-        busy = true;
-        freeSemaphore2();
-
-
-
-        if (xOffsets[currentRow] < horizontalPanels[currentRow].getNumberOfCols() - 1)
-        {
-            xOffsets[currentRow]++;
-            new Thread(new Runnable()
+            if (xOffsets[currentRow] < horizontalPanels[currentRow].getNumberOfCols() - 1)
             {
-                @Override
-                public void run()
-                {
-                    moveRightLeft(true, -xOffsets[currentRow] * getWidth());
-                    lockSemaphore2();
-                    busy = false;
-                    freeSemaphore2();
-                }
-            }).start();
-
+                xOffsets[currentRow]++;
+                moveRightLeft(true, -xOffsets[currentRow] * getWidth());
+            }
+            releaseLockOnCondition();
         }
-        else
-        {
-            lockSemaphore2();
-            busy = false;
-            freeSemaphore2();
-        }
-
-
     }
+
 
     public void gotoPrevColumn()
     {
-        System.out.println("get in prev, sem2: " + isSemaphoreLocked2);
-
-        lockSemaphore2();
-        if(busy)
+        if (lockOnCondition())
         {
-            System.out.println("returned");
-            freeSemaphore2();
-            return;
-        }
-        System.out.println("passed");
-        busy = true;
-        freeSemaphore2();
-
-        if (xOffsets[currentRow] > 0)
-        {
-            xOffsets[currentRow]--;
-            new Thread(new Runnable()
+            if (xOffsets[currentRow] > 0)
             {
-                @Override
-                public void run()
-                {
-                    moveRightLeft(false, -xOffsets[currentRow] * getWidth());
-                    lockSemaphore2();
-                    busy = false;
-                    freeSemaphore2();
-                }
-            }).start();
-        }
-        else
-        {
-            lockSemaphore2();
-            busy = false;
-            freeSemaphore2();
+                xOffsets[currentRow]--;
+                moveRightLeft(false, -xOffsets[currentRow] * getWidth());
+            }
+            releaseLockOnCondition();
         }
     }
 
     public void gotoLowerRow()
     {
-        if(busy)
-            return;
-        synchronized (this)
+        if (lockOnCondition())
         {
-            while (isSemaphoreLocked)
-            {
-                try
-                {
-                    semaphore.wait();
-                } catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            isSemaphoreLocked = true;
-
             if (currentRow < numberOfRows - 1)
             {
                 currentRow++;
-                new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        moveUpDown(true, -currentRow * getHeight());
-                    }
-                }).start();
+                moveUpDown(true, -currentRow * getHeight());
             }
-
-            isSemaphoreLocked = false;
-            notifyAll();
+            releaseLockOnCondition();
         }
     }
 
     public void gotoUpperRow()
     {
-
-        if(busy)
-            return;
-        synchronized (this)
+        if (lockOnCondition())
         {
-            while (isSemaphoreLocked)
-            {
-                try
-                {
-                    semaphore.wait();
-                } catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-            isSemaphoreLocked = true;
-
             if (currentRow > 0)
             {
                 currentRow--;
-                new Thread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        moveUpDown(false, -currentRow * getHeight());
-                    }
-                }).start();
+                moveUpDown(false, -currentRow * getHeight());
             }
-
-            isSemaphoreLocked = false;
-            notifyAll();
+            releaseLockOnCondition();
         }
     }
 
-    private synchronized void moveUpDown(boolean isDirectionDown, int heightDestination)
+    private void moveUpDown(boolean isDirectionDown, int heightDestination)
     {
         int direction = isDirectionDown ? -1 : 1;
         int tempDistance = abs(getYOriginOfThisPanel(direction) + offset.y - heightDestination);
@@ -261,7 +158,7 @@ public class MainFrame extends JFrame
                 repaint();
                 offset.y += (direction * 10);
                 tempDistance -= 10;
-                Thread.sleep(10);
+                Thread.sleep(9);
             } catch (InterruptedException e)
             {
                 e.printStackTrace();
@@ -271,7 +168,7 @@ public class MainFrame extends JFrame
         resetOffsets();
     }
 
-    private synchronized void moveRightLeft(boolean isDirectionRight, int widthDestination)
+    private void moveRightLeft(boolean isDirectionRight, int widthDestination)
     {
         int direction = isDirectionRight ? -1 : 1;
         int tempDistance = abs(getXOriginOfThisPanel(direction) + offset.x - widthDestination);
@@ -283,7 +180,7 @@ public class MainFrame extends JFrame
                 repaint();
                 offset.x += (direction * 10);
                 tempDistance -= 10;
-                Thread.sleep(10);
+                Thread.sleep(9);
             } catch (InterruptedException e)
             {
                 e.printStackTrace();
@@ -293,27 +190,9 @@ public class MainFrame extends JFrame
         resetOffsets();
     }
 
-    private void resetOffsets()
-    {
-        offset.x = offset.y = 0;
-    }
-
     public void moveVert(double offset)
     {
-        while (busy)
-        {
-            return;
-//            try
-//            {
-//                condition.wait();
-//            } catch (InterruptedException e)
-//            {
-//                e.printStackTrace();
-//            }
-        }
-        busy = true;
-
-        synchronized (this)
+        if (lockOnCondition())
         {
             if (offset > 0)
             {
@@ -322,7 +201,8 @@ public class MainFrame extends JFrame
                     this.offset.y = (int) offset;
                     verticalPanel.setLocation(0, getYOriginOfThisPanel(0) + this.offset.y);
                 }
-            } else
+            }
+            else
             {
                 if (currentRow < numberOfRows - 1)
                 {
@@ -330,29 +210,14 @@ public class MainFrame extends JFrame
                     verticalPanel.setLocation(0, getYOriginOfThisPanel(0) + this.offset.y);
                 }
             }
-
-            busy = false;
-            notifyAll();
+            releaseLockOnCondition();
         }
     }
 
     public void moveHort(double offset)
     {
-        while (busy)
+        if (lockOnCondition())
         {
-            return;
-//            try
-//            {
-//                condition.wait();
-//            } catch (InterruptedException e)
-//            {
-//                e.printStackTrace();
-//            }
-        }
-
-        synchronized (this)
-        {
-            busy = true;
             if (offset > 0)
             {
                 if (xOffsets[currentRow] > 0)
@@ -360,7 +225,8 @@ public class MainFrame extends JFrame
                     this.offset.x = (int) offset;
                     horizontalPanels[currentRow].setLocation(getXOriginOfThisPanel(0) + this.offset.x, 0);
                 }
-            } else
+            }
+            else
             {
                 if (xOffsets[currentRow] < horizontalPanels[currentRow].getNumberOfCols() - 1)
                 {
@@ -369,32 +235,13 @@ public class MainFrame extends JFrame
                 }
 
             }
-            busy = false;
-            notifyAll();
+            releaseLockOnCondition();
         }
     }
 
-    private synchronized void freeSemaphore2()
+    private void resetOffsets()
     {
-        isSemaphoreLocked2 = false;
-        MainFrame.this.notifyAll();
-    }
-
-    private synchronized void lockSemaphore2()
-    {
-        System.out.println("before " + isSemaphoreLocked2);
-        while(isSemaphoreLocked2)
-        {
-            try
-            {
-                System.out.println("locked");
-                MainFrame.this.wait();
-            } catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-        }
-        isSemaphoreLocked2 = true;
+        offset.x = offset.y = 0;
     }
 
     private int getXOriginOfThisPanel(int shiftValue)
@@ -406,4 +253,35 @@ public class MainFrame extends JFrame
     {
         return -(currentRow + shiftValue) * getHeight();
     }
+
+    private boolean lockOnCondition()
+    {
+        synchronized (condition)
+        {
+            if (isConditionLocked)
+                return false;
+//            while (isConditionLocked)
+//            {
+//                try
+//                {
+//                    condition.wait();
+//                } catch (InterruptedException e)
+//                {
+//                    e.printStackTrace();
+//                }
+//            }
+            isConditionLocked = true;
+            return true;
+        }
+    }
+
+    private void releaseLockOnCondition()
+    {
+        synchronized (condition)
+        {
+            isConditionLocked = false;
+            condition.notifyAll();
+        }
+    }
+
 }
