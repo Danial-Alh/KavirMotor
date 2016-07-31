@@ -9,12 +9,12 @@ import java.io.File;
 import java.io.IOException;
 
 public class MainFrame extends JFrame {
+    private JPanel mainPanel;
+    private TransparentFrontPanel frontPanel;
     public String[] mainPaths, detailPaths;
     public ImagePanel[] imagePanels;
-    public static boolean pressed;
-    public static int x, y;
     private int currentImgIndex;
-    private JPanel mainPanel;
+
     private int offset;
 
     private Image kavirImg;
@@ -24,6 +24,7 @@ public class MainFrame extends JFrame {
         this.detailPaths = detailPaths;
         this.currentImgIndex = 0;
         this.offset = 0;
+
         imagePanels = new ImagePanel[mainPaths.length];
         try {
             kavirImg = ImageIO.read(new File("kavir/kavir.JPG"));
@@ -35,7 +36,7 @@ public class MainFrame extends JFrame {
     }
 
     private void setupJframe() {
-        setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(),(int) Toolkit.getDefaultToolkit().getScreenSize().getHeight());
+        setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(), (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight());
 //        setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBackground(Color.WHITE);
@@ -45,7 +46,7 @@ public class MainFrame extends JFrame {
 
         mainPanel = new JPanel();
         mainPanel.setLayout(null);
-        mainPanel.setSize(getWidth()*mainPaths.length, getHeight());
+        mainPanel.setSize(getWidth() * mainPaths.length, getHeight());
         mainPanel.setLocation(0, 0);
 
         for (int i = 0; i < imagePanels.length; i++) {
@@ -56,31 +57,21 @@ public class MainFrame extends JFrame {
         }
 
         getContentPane().add(mainPanel);
+
+        frontPanel = new TransparentFrontPanel(this);
+        getContentPane().add(frontPanel);
         setVisible(true);
     }
 
     public void gotoNextImage() {
-        if (currentImgIndex < imagePanels.length-1) {
+        if (currentImgIndex < imagePanels.length - 1) {
             currentImgIndex++;
 //            imagePanels[currentImgIndex].reset();
 
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int width = getWidth();
-                    while (width > 0) {
-                        try {
-                            mainPanel.setLocation(offset, 0);
-                            repaint();
-                            offset -= 10;
-                            width -= 10;
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    offset = -currentImgIndex * getWidth();
-                    mainPanel.setLocation(offset, 0);
+                    moveRightLeft(true);
                 }
             }).start();
         }
@@ -94,24 +85,29 @@ public class MainFrame extends JFrame {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int width = getWidth();
-                    while (width > 0) {
-                        try {
-                            mainPanel.setLocation(offset, 0);
-                            repaint();
-                            offset += 10;
-                            width -= 10;
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    offset = -currentImgIndex * getWidth();
-                    mainPanel.setLocation(offset, 0);
+                    moveRightLeft(false);
                 }
             }).start();
             imagePanels[currentImgIndex].reset();
         }
+    }
+
+    private synchronized void moveRightLeft(boolean isDirectionRight) {
+        int direction = isDirectionRight ? -1 : 1;
+        int width = getWidth();
+        while (width > 0) {
+            try {
+                mainPanel.setLocation(offset, 0);
+                repaint();
+                offset += (direction * 10);
+                width -= 10;
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        offset = -currentImgIndex * getWidth();
+        mainPanel.setLocation(offset, 0);
     }
 
     public void stayOnThisImage() {
