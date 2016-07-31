@@ -1,14 +1,15 @@
-
 package UI;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 
-public class Main {
+public class Main
+{
 
     private static JFrame frm;
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
 
 
         //specifypaths

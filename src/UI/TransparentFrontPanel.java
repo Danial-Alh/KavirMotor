@@ -6,27 +6,27 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.pow;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
-public class TransparentFrontPanel extends JPanel implements MouseMotionListener, MouseListener {
+public class TransparentFrontPanel extends JPanel implements MouseMotionListener, MouseListener
+{
 
     private MainFrame parent;
     private Point startPoint;
     private Point endPoint;
     private Point currentPoint;
     private Boolean currentMovingAxis;
-    private double offset;
 
-    public TransparentFrontPanel(MainFrame parent) {
+    public TransparentFrontPanel(MainFrame parent)
+    {
         this.parent = parent;
         init();
     }
 
-    private void init() {
+    private void init()
+    {
         setSize(parent.getSize());
-        setLocation(0,0);
+        setLocation(0, 0);
         setBackground(Color.BLUE);
         setOpaque(false);
         addMouseListener(this);
@@ -35,71 +35,78 @@ public class TransparentFrontPanel extends JPanel implements MouseMotionListener
 
 
     @Override
-    public void mouseDragged(MouseEvent e) {
-        currentPoint=new Point(e.getX(),e.getY());
-        double hortizalD = endPoint.getX()-startPoint.getX();
-        double verticalD = endPoint.getY()-startPoint.getY();
-        if (currentMovingAxis==null) {
-            if (sqrt(pow(hortizalD, 2) + pow(verticalD, 2)) > 20) {
+    public synchronized void mouseDragged(MouseEvent e)
+    {
+        currentPoint = new Point(e.getX(), e.getY());
+        double hortizalD = currentPoint.getX() - startPoint.getX();
+        double verticalD = currentPoint.getY() - startPoint.getY();
+        if (currentMovingAxis == null)
+        {
+            if (sqrt(pow(hortizalD, 2) + pow(verticalD, 2)) > 20)
+            {
 
                 if (abs(hortizalD) < abs(verticalD))
-                    currentMovingAxis=Boolean.TRUE;
+                    currentMovingAxis = Boolean.TRUE;
                 else
-                    currentMovingAxis=Boolean.FALSE;
+                    currentMovingAxis = Boolean.FALSE;
             }
-        }
-        else {
-            if(currentMovingAxis==Boolean.TRUE)
-                moveVert(currentPoint.getY()-startPoint.getY());
-
-                moveHort(currentPoint.getX()-startPoint.getX());
-
-
+        } else
+        {
+            if (currentMovingAxis == Boolean.TRUE)
+                parent.moveVert(currentPoint.getY() - startPoint.getY());
+            else
+                parent.moveHort(currentPoint.getX() - startPoint.getX());
 
 
         }
     }
 
 
-
-
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(MouseEvent e)
+    {
 
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(MouseEvent e)
+    {
 
     }
 
     @Override
-    public void mousePressed(MouseEvent e) {
-        offset=new Point(0,);
-        startPoint=new Point(e.getX(),e.getY());
+    public void mousePressed(MouseEvent e)
+    {
+        startPoint = new Point(e.getX(), e.getY());
     }
 
     @Override
-    public void mouseReleased(MouseEvent e) {
-        endPoint=new Point(e.getX(),e.getY());
-        double hortizalD = endPoint.getX()-startPoint.getX();
-        double verticalD = endPoint.getY()-startPoint.getY();
-        if(currentMovingAxis==Boolean.TRUE);
-            //sweepVert();
-        else {
-            if (hortizalD > 0) parent.gotoNextImage();
-            if (hortizalD < 0) parent.gotoPrevImage();
+    public void mouseReleased(MouseEvent e)
+    {
+        endPoint = new Point(e.getX(), e.getY());
+        double hortizalD = endPoint.getX() - startPoint.getX();
+        double verticalD = endPoint.getY() - startPoint.getY();
+        if (currentMovingAxis == Boolean.TRUE)
+        {
+            if (verticalD > 0) parent.gotoUpperRow();
+            if (verticalD < 0) parent.gotoLowerRow();
+        } else
+        {
+            if (hortizalD > 0) parent.gotoPrevColumn();
+            if (hortizalD < 0) parent.gotoNextColumn();
         }
-        currentMovingAxis=null;
-        }
+        currentMovingAxis = null;
+    }
 
     @Override
-    public void mouseEntered(MouseEvent e) {
+    public void mouseEntered(MouseEvent e)
+    {
 
     }
 
     @Override
-    public void mouseExited(MouseEvent e) {
+    public void mouseExited(MouseEvent e)
+    {
 
     }
-};
+}

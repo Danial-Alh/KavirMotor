@@ -3,21 +3,15 @@ package UI;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.io.File;
 import java.io.IOException;
-
-import static java.lang.Math.abs;
 
 class ImagePanel extends JPanel
 {
 
-    MainFrame parent;
-
     public Image img;
     public String imgPath;
+    MainFrame parent;
 
     public ImagePanel(MainFrame parent, String imgPath)
     {
