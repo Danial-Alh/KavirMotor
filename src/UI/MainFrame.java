@@ -12,20 +12,24 @@ public class MainFrame extends JFrame
     private HorizontalPanel[] horizontalPanels;
     private TransparentFrontPanel frontPanel;
 
-    public String[] mainPaths, detailPaths;
-    public ImagePanel[] imagePanels;
+    private String[] mainPaths, detailPaths;
+    private ImagePanel[] imagePanels;
     private ImagePanel detailPanel;
 
-    private Point currentLocation;
-    private final int rowNumbers = 2;
+    private final int numberOfRows = 2;
+    private int[] xOffsets;
+    private int currentRow;
     private Image kavirImg;
 
     public MainFrame(String[] mainPaths, String[] detailPaths) throws HeadlessException
     {
         this.mainPaths = mainPaths;
         this.detailPaths = detailPaths;
-        this.currentLocation = new Point(0,0);
 
+        this.currentRow = 0;
+        this.xOffsets = new int[numberOfRows];
+        for(int i = 0; i < xOffsets.length; i++)
+            xOffsets[i] = 0;
         imagePanels = new ImagePanel[mainPaths.length];
         try
         {
@@ -41,22 +45,21 @@ public class MainFrame extends JFrame
     private void setupJframe()
     {
         setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(), (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight());
-//        setSize(1920, 1080);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBackground(Color.WHITE);
         setUndecorated(true);
         setLayout(null);
 
-        horizontalPanels = new HorizontalPanel[rowNumbers];
+        horizontalPanels = new HorizontalPanel[numberOfRows];
+        verticalPanel = new VerticalPanel(this, 2);
 
         setupFirstRow();
         setupSecondRow();
 
-        verticalPanel = new VerticalPanel(this, 2);
-        getContentPane().add(verticalPanel);
 
         frontPanel = new TransparentFrontPanel(this);
         getContentPane().add(frontPanel);
+        getContentPane().add(verticalPanel);
 
         setVisible(true);
     }
@@ -70,7 +73,7 @@ public class MainFrame extends JFrame
             imagePanels[i] = new ImagePanel(this, mainPaths[i]);
             horizontalPanels[0].addPanel(imagePanels[i]);
         }
-
+        verticalPanel.addRow(horizontalPanels[0]);
     }
 
     private void setupSecondRow()
@@ -79,15 +82,15 @@ public class MainFrame extends JFrame
 
         detailPanel = new ImagePanel(this, detailPaths[0]);
         horizontalPanels[1].addPanel(detailPanel);
+
+        verticalPanel.addRow(horizontalPanels[1]);
     }
 
-    public void gotoNextImage()
+    public void gotoNextColumn()
     {
-        if (currentLocation.getX() < imagePanels.length - 1)
+        if (xOffsets[currentRow] < horizontalPanels[currentRow].getNumberOfCols() - 1)
         {
-            currentLocation.x++;
-//            imagePanels[currentImgIndex].reset();
-
+            xOffsets[currentRow]++;
             new Thread(new Runnable()
             {
                 @Override
@@ -99,13 +102,11 @@ public class MainFrame extends JFrame
         }
     }
 
-    public void gotoPrevImage()
+    public void gotoPrevColumn()
     {
-        if (currentLocation.getX() > 0)
+        if (xOffsets[currentRow] > 0)
         {
-            currentLocation.x--;
-//            imagePanels[currentImgIndex].reset();
-
+            xOffsets[currentRow]--;
             new Thread(new Runnable()
             {
                 @Override
@@ -117,16 +118,71 @@ public class MainFrame extends JFrame
         }
     }
 
+    public void gotoLowerRow()
+    {
+        if (currentRow < numberOfRows - 1)
+        {
+            currentRow++;
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    moveUpDown(true);
+                }
+            }).start();
+        }
+    }
+
+    public void gotoUpperRow()
+    {
+        if (currentRow > 0)
+        {
+            currentRow--;
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    moveUpDown(false);
+                }
+            }).start();
+        }
+    }
+
+    private synchronized void moveUpDown(boolean isDirectionDown)
+    {
+        int direction = isDirectionDown ? -1 : 1;
+        int height = getHeight();
+        int offset = (currentRow + direction) * -1 * getHeight();
+        while (height > 0)
+        {
+            try
+            {
+                verticalPanel.setLocation(0, offset);
+                repaint();
+                offset += (direction * 10);
+                height -= 10;
+                Thread.sleep(10);
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        offset = -currentRow * getHeight();
+        verticalPanel.setLocation(0, offset);
+    }
+
     private synchronized void moveRightLeft(boolean isDirectionRight)
     {
         int direction = isDirectionRight ? -1 : 1;
         int width = getWidth();
-        int offset = (int) (currentLocation.getX() * -1);
+        int offset = (xOffsets[currentRow] + direction) * -1 * getWidth();
         while (width > 0)
         {
             try
             {
-                horizontalPanels[(int) currentLocation.getY()].setLocation(offset, 0);
+                horizontalPanels[currentRow].setLocation(offset, 0);
                 repaint();
                 offset += (direction * 10);
                 width -= 10;
@@ -136,8 +192,8 @@ public class MainFrame extends JFrame
                 e.printStackTrace();
             }
         }
-        offset = (int) (-currentLocation.getX() * getWidth());
-        verticalPanel.setLocation(offset, 0);
+        offset = -xOffsets[currentRow] * getWidth();
+        horizontalPanels[currentRow].setLocation(offset, 0);
     }
 
     public void stayOnThisImage()

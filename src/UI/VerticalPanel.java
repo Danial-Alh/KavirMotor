@@ -1,6 +1,7 @@
 package UI;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class VerticalPanel extends JPanel
 {
@@ -15,8 +16,10 @@ public class VerticalPanel extends JPanel
         this.numberOfRowsAdded = 0;
 
         setLayout(null);
-        setSize(getWidth() * size, getHeight());
+        setSize(parent.getWidth(), parent.getHeight() * size);
         setLocation(0, 0);
+        setBackground(Color.WHITE);
+
     }
 
     public void addRow(HorizontalPanel horizontalPanel)

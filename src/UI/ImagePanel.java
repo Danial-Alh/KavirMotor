@@ -25,18 +25,20 @@ class ImagePanel extends JPanel
         this.imgPath = imgPath;
         try
         {
-            img =  ImageIO.read(new File(imgPath));
+            img = ImageIO.read(new File(imgPath));
         } catch (IOException e)
         {
             e.printStackTrace();
         }
-        setSize(this.parent.getSize());
+        setSize((int) Toolkit.getDefaultToolkit().getScreenSize().getWidth(),
+                (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight());
         setLayout(null);
     }
 
     public void paintComponent(Graphics g)
     {
         g.setColor(Color.white);
+        g.fillRect(0, 0, getWidth(), getHeight());
         g.drawImage(img, (getWidth() - img.getWidth(null)) / 2, (getHeight() - img.getHeight(null)) / 2, null);
     }
 }
